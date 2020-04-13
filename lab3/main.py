@@ -28,7 +28,7 @@ class Lab3:
         P = lambda i: self.__calc_p__(i)
         Q = lambda i: self.__calc_q__(i)
 
-        self.s = np.zeros(n + 1)
+        self.s = np.zeros(n)
         for i in range(n):
             self.s[i] = sum([d(j) for j in range(0, i - 1)])
 
@@ -169,6 +169,7 @@ class Lab3:
         self.is_x = is_x
         i = self.__calc_i__(s)
         t = (s - self.s[i]) / self.__calc_dist__(i)
+        # t = s
         term1 = self.__calc_a__(i) * t
         term2 = self.__calc_b__(i) * (1 - t)
         term3 = (self.__calc_c__(i) * np.power(t, 3)) / (1 + self.__get_p__(i) * (1 - t))
@@ -182,10 +183,10 @@ class Lab3:
 
 
 def main():
-    n = 10000
-    t1 = -3 * np.pi
+    n = 100
+    t1 = -9 * np.pi
     # t1 = -np.pi / 3
-    t2 = 3 * np.pi
+    t2 = 9 * np.pi
     # t2 = np.pi / 3
     a_param = 0.01
     b_param = 0.15
@@ -193,19 +194,19 @@ def main():
     x = func_x(a_param, b_param, t)
     y = func_y(a_param, b_param, t)
 
-    p = [0 for i in range(0, n)]
-    q = [0 for i in range(0, n)]
+    p = [-0.29 for i in range(0, n)]
+    q = [-0.29 for i in range(0, n)]
 
     solver = Lab3(p, q, list(zip(t, x, y)))
 
-    tt = np.linspace(t1, t2, num=10000 + 1)
+    tt = np.linspace(t1, t2, num=1000 + 1)
 
-    plt.plot([func_x(a_param, b_param, t_) for t_ in tt], [func_y(a_param, b_param, t_) for t_ in tt], label="func",
-             lw=3)
+    plt.plot([func_x(a_param, b_param, t_) for t_ in tt], [func_y(a_param, b_param, t_) for t_ in tt], label="func", lw=3)
     plt.plot([solver.s_x(t_) for t_ in tt], [solver.s_y(t_) for t_ in tt], label="spline")
     plt.legend()
+    plt.xlim(1, -1)
+    plt.ylim(1, -1)
     plt.show()
-    plt.axis('equal')
     return 0
 
 
