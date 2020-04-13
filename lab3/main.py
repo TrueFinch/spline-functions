@@ -3,13 +3,13 @@ import matplotlib.pyplot as plt
 
 
 def func_x(a, b, t) -> float:
-    # return a * np.exp(b * t) * np.cos(t)
-    return 5 * np.tan(t)
+    return a * np.exp(b * t) * np.cos(t)
+    # return 5 * np.tan(t)
 
 
 def func_y(a, b, t) -> float:
-    # return a * np.exp(b * t) * np.sin(t)
-    return 5 * np.power(np.cos(t), 2)
+    return a * np.exp(b * t) * np.sin(t)
+    # return 5 * np.power(np.cos(t), 2)
 
 
 class Lab3:
@@ -27,6 +27,10 @@ class Lab3:
         c = lambda i: self.__calc_c_term__(i)
         P = lambda i: self.__calc_p__(i)
         Q = lambda i: self.__calc_q__(i)
+
+        self.s = np.zeros(n + 1)
+        for i in range(n):
+            self.s[i] = sum([d(j) for j in range(0, i - 1)])
 
         y0 = d(0) / d(1)
         yn = d(n - 1) / d(n - 2)
@@ -119,11 +123,9 @@ class Lab3:
         for i in range(0, len(self.points) - 1):
             t1, _, _ = self.points[i]
             t2, _, _ = self.points[i + 1]
-            if t1 <= t < t2:
+            if t1 <= t <= t2:
+                # print(i)
                 return i
-        t3, _, _ = self.points[len(self.points) - 1]
-        if t <= t3:
-            return len(self.points) - 2
         assert False, "ERROR: 'i' not found!"
 
     def __calc_lmbd__(self, i):
@@ -163,41 +165,47 @@ class Lab3:
         _, _, y_ = self.points[i]
         return y_
 
-    def __s__(self, t, is_x: bool):
+    def __s__(self, s, is_x: bool):
         self.is_x = is_x
-        i = self.__calc_i__(t)
+        i = self.__calc_i__(s)
+        t = (s - self.s[i]) / self.__calc_dist__(i)
         term1 = self.__calc_a__(i) * t
         term2 = self.__calc_b__(i) * (1 - t)
         term3 = (self.__calc_c__(i) * np.power(t, 3)) / (1 + self.__get_p__(i) * (1 - t))
         term4 = (self.__calc_d__(i) * np.power(1 - t, 3)) / (1 + self.__get_q__(i) * t)
         return term1 + term2 + term3 + term4
+        # term1 = self.__get_node__(i) * (1 - t)
+        # term2 = self.__get_node__(i + 1) * t
+        # term3 = self.__calc_c__(i) * (np.power(t, 3) / (1 + self.__get_p__(i) * (1 - t)) - t)
+        # term4 = self.__calc_d__(i) * (np.power(1 - t, 3) / (1 + self.__get_q__(i) * t) - (1 - t))
+        # return term1 + term2 + term3 + term4
 
 
 def main():
-    n = 10
-    # t1 = -3 * np.pi
-    t1 = -np.pi / 3
-    # t2 = 3 * np.pi
-    t2 = np.pi / 3
+    n = 10000
+    t1 = -3 * np.pi
+    # t1 = -np.pi / 3
+    t2 = 3 * np.pi
+    # t2 = np.pi / 3
     a_param = 0.01
     b_param = 0.15
     t = np.linspace(t1, t2, num=n + 1)
     x = func_x(a_param, b_param, t)
     y = func_y(a_param, b_param, t)
 
-    p = [-0.5 for i in range(0, n)]
-    q = [-0.5 for i in range(0, n)]
+    p = [0 for i in range(0, n)]
+    q = [0 for i in range(0, n)]
 
     solver = Lab3(p, q, list(zip(t, x, y)))
 
-    tt = np.linspace(t1, t2, num=10 + 1)
+    tt = np.linspace(t1, t2, num=10000 + 1)
 
     plt.plot([func_x(a_param, b_param, t_) for t_ in tt], [func_y(a_param, b_param, t_) for t_ in tt], label="func",
              lw=3)
     plt.plot([solver.s_x(t_) for t_ in tt], [solver.s_y(t_) for t_ in tt], label="spline")
     plt.legend()
     plt.show()
-    # plt.axis('equal')
+    plt.axis('equal')
     return 0
 
 
