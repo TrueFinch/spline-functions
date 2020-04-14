@@ -31,7 +31,7 @@ def main(configuration):
     x_dots = np.linspace(configuration["x_start"], configuration["x_end"], num=10000)
     y_dots = func(a, x_dots)
     s_dots = np.array([s(x_, x, m_res, y, n, diff, a) for x_ in x_dots])
-    plt.plot(x_dots, y_dots, label="func")
+    plt.plot(x_dots, y_dots, label="function")
     plt.plot(x_dots, s_dots, label="spline")
     plt.legend()
     plt.show()
@@ -42,4 +42,4 @@ def main(configuration):
 
 
 if __name__ == "__main__":
-    main(configurations[0])
+    main(configurations[19])
