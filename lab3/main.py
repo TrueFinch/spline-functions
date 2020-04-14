@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 
 
 def func_x(a, b, t) -> float:
@@ -28,8 +29,8 @@ class Lab3:
         P = lambda i: self.__calc_p__(i)
         Q = lambda i: self.__calc_q__(i)
 
-        self.s = np.zeros(n)
-        for i in range(n):
+        self.s = np.zeros(n + 1)
+        for i in range(n + 1):
             self.s[i] = sum([d(j) for j in range(0, i - 1)])
 
         y0 = d(0) / d(1)
@@ -119,11 +120,11 @@ class Lab3:
         return np.sqrt(np.power(self.__get_x__(i + 1) - self.__get_x__(i), 2) +
                        np.power(self.__get_y__(i + 1) - self.__get_y__(i), 2))
 
-    def __calc_i__(self, t):
-        for i in range(0, len(self.points) - 1):
-            t1, _, _ = self.points[i]
-            t2, _, _ = self.points[i + 1]
-            if t1 <= t <= t2:
+    def __calc_i__(self, s):
+        for i in range(0, len(self.s) - 1):
+            s1 = self.s[i]
+            s2 = self.s[i + 1]
+            if s1 <= s <= s2:
                 # print(i)
                 return i
         assert False, "ERROR: 'i' not found!"
@@ -135,12 +136,12 @@ class Lab3:
         return 1 - self.__calc_lmbd__(i)
 
     def __calc_p__(self, i):
-        term1 = 3 + 3 * self.__get_p__(i) + np.power(self.__get_p__(i), 2)
+        term1 = 3 + 3 * self.__get_p__(i) + math.pow(self.__get_p__(i), 2)
         term2 = (2 + self.__get_q__(i)) * (2 + self.__get_p__(i)) - 1
         return term1 / term2
 
     def __calc_q__(self, i):
-        term1 = 3 + 3 * self.__get_q__(i) + np.power(self.__get_q__(i), 2)
+        term1 = 3 + 3 * self.__get_q__(i) + math.pow(self.__get_q__(i), 2)
         term2 = (2 + self.__get_q__(i)) * (2 + self.__get_p__(i)) - 1
         return term1 / term2
 
@@ -170,6 +171,7 @@ class Lab3:
         i = self.__calc_i__(s)
         t = (s - self.s[i]) / self.__calc_dist__(i)
         # t = s
+        # print(t)
         term1 = self.__calc_a__(i) * t
         term2 = self.__calc_b__(i) * (1 - t)
         term3 = (self.__calc_c__(i) * np.power(t, 3)) / (1 + self.__get_p__(i) * (1 - t))
@@ -184,29 +186,38 @@ class Lab3:
 
 def main():
     n = 100
-    t1 = -9 * np.pi
-    # t1 = -np.pi / 3
-    t2 = 9 * np.pi
-    # t2 = np.pi / 3
+    t1 = -3 * np.pi
+    t2 = 3 * np.pi
     a_param = 0.01
     b_param = 0.15
     t = np.linspace(t1, t2, num=n + 1)
     x = func_x(a_param, b_param, t)
     y = func_y(a_param, b_param, t)
 
-    p = [-0.29 for i in range(0, n)]
-    q = [-0.29 for i in range(0, n)]
+    p = [-0.5 for i in range(0, n)]
+    q = [-0.5 for i in range(0, n)]
 
     solver = Lab3(p, q, list(zip(t, x, y)))
 
-    tt = np.linspace(t1, t2, num=1000 + 1)
+    n2 = 1000
+    tt = np.linspace(t1, t2, num=n2)
+    f_x_dots = np.array([func_x(a_param, b_param, t_) for t_ in tt])
+    f_y_dots = np.array([func_y(a_param, b_param, t_) for t_ in tt])
+    s_x_dots = np.array([solver.s_x(s_) for s_ in np.linspace(0, solver.s[len(solver.s) - 1], num=n2)])
+    s_y_dots = np.array([solver.s_y(s_) for s_ in np.linspace(0, solver.s[len(solver.s) - 1], num=n2)])
+    sum = 0
+    for i in range(n2):
+        sum = math.pow(f_x_dots[i] - s_x_dots[i], 2) + math.pow(f_y_dots[i] - s_y_dots[i], 2)
+    sum = math.sqrt(sum) / n2
+    print(sum)
 
-    plt.plot([func_x(a_param, b_param, t_) for t_ in tt], [func_y(a_param, b_param, t_) for t_ in tt], label="func", lw=3)
-    plt.plot([solver.s_x(t_) for t_ in tt], [solver.s_y(t_) for t_ in tt], label="spline")
+    plt.plot(f_x_dots, f_y_dots, label="func", lw=3)
+    plt.plot(s_x_dots, s_y_dots, label="spline")
     plt.legend()
-    plt.xlim(1, -1)
-    plt.ylim(1, -1)
+    # plt.xlim(1, -1)
+    # plt.ylim(1, -1)
     plt.show()
+
     return 0
 
 

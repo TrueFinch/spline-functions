@@ -42,4 +42,4 @@ def main(configuration):
 
 
 if __name__ == "__main__":
-    main(configurations[9])
+    main(configurations[0])
