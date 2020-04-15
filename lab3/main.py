@@ -187,30 +187,38 @@ def main():
     x = func_x(a_param, b_param, t)
     y = func_y(a_param, b_param, t)
 
-    p = [-0.5 for i in range(0, n)]
-    q = [-0.5 for i in range(0, n)]
+    k = np.linspace(-0.9, 1000, 100)
+    err = []
+    for k_ in k:
+        p = [k_ for i in range(0, n)]
+        q = [k_ for i in range(0, n)]
 
-    solver = Lab3(p, q, list(zip(t, x, y)))
+        solver = Lab3(p, q, list(zip(t, x, y)))
 
-    n2 = 1000
-    tt = np.linspace(t1, t2, num=n2)
-    f_x_dots = np.array([func_x(a_param, b_param, t_) for t_ in tt])
-    f_y_dots = np.array([func_y(a_param, b_param, t_) for t_ in tt])
-    s_x_dots = np.array([solver.s_x(s_) for s_ in np.linspace(0, solver.s[len(solver.s) - 1], num=n2)])
-    s_y_dots = np.array([solver.s_y(s_) for s_ in np.linspace(0, solver.s[len(solver.s) - 1], num=n2)])
-    sum = 0
-    for i in range(n2):
-        sum = math.pow(f_x_dots[i] - s_x_dots[i], 2) + math.pow(f_y_dots[i] - s_y_dots[i], 2)
-    sum = math.sqrt(sum) / n2
-    print(sum)
+        n2 = 1000
+        tt = np.linspace(t1, t2, num=n2)
+        f_x_dots = np.array([func_x(a_param, b_param, t_) for t_ in tt])
+        f_y_dots = np.array([func_y(a_param, b_param, t_) for t_ in tt])
+        s_x_dots = np.array([solver.s_x(s_) for s_ in np.linspace(0, solver.s[len(solver.s) - 1], num=n2)])
+        s_y_dots = np.array([solver.s_y(s_) for s_ in np.linspace(0, solver.s[len(solver.s) - 1], num=n2)])
+        sum = 0
+        for i in range(n2):
+            sum += math.sqrt(math.pow(f_x_dots[i] - s_x_dots[i], 2) + math.pow(f_y_dots[i] - s_y_dots[i], 2))
+        sum = sum / n2
+        err.append(sum)
 
-    plt.plot(f_x_dots, f_y_dots, label="func", lw=3)
-    plt.plot(s_x_dots, s_y_dots, label="spline")
-    plt.legend()
-    # plt.xlim(1, -1)
-    # plt.ylim(1, -1)
+        plt.plot(f_x_dots, f_y_dots, label="func", lw=3)
+        plt.plot(s_x_dots, s_y_dots, label="spline")
+        plt.legend()
+        plt.show()
+
+    fig, ax = plt.subplots()
+    ax.grid()
+    ax.plot(k, err, label="error")
+    ax.legend()
+    ax.set_xlabel('p, q')
+    ax.set_ylabel('error')
     plt.show()
-
     return 0
 
 
