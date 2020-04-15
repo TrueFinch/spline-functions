@@ -170,18 +170,11 @@ class Lab3:
         self.is_x = is_x
         i = self.__calc_i__(s)
         t = (s - self.s[i]) / self.__calc_dist__(i)
-        # t = s
-        # print(t)
         term1 = self.__calc_a__(i) * t
         term2 = self.__calc_b__(i) * (1 - t)
         term3 = (self.__calc_c__(i) * np.power(t, 3)) / (1 + self.__get_p__(i) * (1 - t))
         term4 = (self.__calc_d__(i) * np.power(1 - t, 3)) / (1 + self.__get_q__(i) * t)
         return term1 + term2 + term3 + term4
-        # term1 = self.__get_node__(i) * (1 - t)
-        # term2 = self.__get_node__(i + 1) * t
-        # term3 = self.__calc_c__(i) * (np.power(t, 3) / (1 + self.__get_p__(i) * (1 - t)) - t)
-        # term4 = self.__calc_d__(i) * (np.power(1 - t, 3) / (1 + self.__get_q__(i) * t) - (1 - t))
-        # return term1 + term2 + term3 + term4
 
 
 def main():

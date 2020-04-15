@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import matplotlib.pyplot as plt
 
 from lab1.configurations import configurations
 from scipy import integrate
@@ -86,7 +87,8 @@ def main(configuration):
     n = configuration["n"]
     x = np.linspace(configuration["x_start"], configuration["x_end"], num=n + 1)
     y = np.array([func(a, x_) for x_ in x])
-    e = [1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1]
+    e = np.linspace(1e-5, 1, num=100)
+    d = []
     for e_ in e:
         eps = [e_ for i in range(n + 1)]
         solver = Lab2(list(zip(eps, x, y)), lambda x_: diff2(a, x_))
@@ -94,11 +96,20 @@ def main(configuration):
         y_res = integrate.quad(lambda x_: func(a, x_), configuration["x_start"], configuration["x_end"])[0]
         s_res = solver.sdx()
 
-        d = abs(y_res - s_res)
-        print("eps {} : error {}".format(e_, d))
-
+        d_ = abs(y_res - s_res)
+        # print("eps {} : error {}".format(e_, d_))
+        d.append(d_)
+    fig, ax = plt.subplots()
+    ax.grid()
+    ax.plot(e, d, label="error")
+    ax.legend()
+    ax.set_xlabel('eps')
+    ax.set_ylabel('error')
+    plt.show()
     return 0
 
 
 if __name__ == "__main__":
-    main(configurations[0])
+    for i in [0, 2, 5, 9, 10, 12, 15, 19]:
+        print("a = {}".format(i % 10 + 1))
+        main(configurations[i])
